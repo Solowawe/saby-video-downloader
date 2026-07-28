@@ -1,3 +1,12 @@
+---
+title: Saby Video Downloader
+emoji: 🎬
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+---
+
 # Saby Video Downloader — Web Service
 
 Веб-сервис для получения прямых CDN ссылок на видео с saby.ru.
@@ -25,28 +34,6 @@ uvicorn main:app --reload --port 8000
 ```
 
 Откройте http://localhost:8000
-
-## Деплой на Render.com
-
-1. Создайте аккаунт на [render.com](https://render.com) (GitHub OAuth)
-2. Нажмите **New +** → **Web Service**
-3. Подключите GitHub репозиторий или выберите **Upload from folder**
-4. Настройки:
-   - **Name:** `saby-video-downloader` (или любое другое)
-   - **Root Directory:** `web_service` (если репозиторий содержит весь проект)
-   - **Runtime:** `Python 3`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - **Plan:** Free
-5. Нажмите **Create Web Service**
-
-После деплоя сервис будет доступен по адресу:
-```
-https://saby-video-downloader.onrender.com
-```
-
-**Важно:** На бесплатном тарифе Render сервис "засыпает" после 15 минут бездействия.
-При первом запросе после сна загрузка может занять 10-30 секунд.
 
 ## API
 
@@ -88,7 +75,7 @@ Health check.
 web_service/
 ├── main.py              # FastAPI приложение
 ├── requirements.txt     # Зависимости
-├── runtime.txt          # Версия Python
+├── Dockerfile           # Docker-образ
 ├── templates/
 │   └── index.html       # Главная страница
 ├── static/
