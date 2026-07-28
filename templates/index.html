@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saby Video Downloader</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Saby Video Downloader</h1>
+            <p class="subtitle">Получите прямую ссылку на видео с saby.ru</p>
+        </header>
+
+        <main>
+            <!-- Форма ввода -->
+            <section class="card input-section">
+                <form id="extract-form" autocomplete="off">
+                    <label for="url-input" class="input-label">
+                        Вставьте ссылку на вебинар с Saby:
+                    </label>
+                    <div class="input-row">
+                        <input
+                            type="url"
+                            id="url-input"
+                            class="url-input"
+                            placeholder="https://play.saby.ru/multimedia-converter/embed/..."
+                            required
+                        >
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            <span class="btn-text">Получить ссылку</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                    </div>
+                    <p class="hint">
+                        Пример: <code>https://play.saby.ru/multimedia-converter/embed/8884880e-7a5e-483c-bf8e-69bb9faa51ae_e4a8bd70-eb55-467c-84bb-1a1715031703</code>
+                    </p>
+                </form>
+            </section>
+
+            <!-- Результат -->
+            <section id="result-section" class="card result-section hidden">
+                <div class="result-header">
+                    <h2>✅ Готово!</h2>
+                    <span id="file-size" class="file-size"></span>
+                </div>
+
+                <div class="result-info">
+                    <div class="info-row">
+                        <span class="info-label">Исходная ссылка:</span>
+                        <span id="input-url-display" class="info-value url-display"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Прямая CDN ссылка:</span>
+                        <div class="cdn-url-row">
+                            <input type="text" id="cdn-url-display" class="cdn-url-input" readonly>
+                            <button id="copy-btn" class="btn btn-copy" title="Копировать">
+                                📋 Копировать
+                            </button>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Имя файла:</span>
+                        <span id="filename-display" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Доступность:</span>
+                        <span id="accessibility-display" class="info-value"></span>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <a id="download-link" class="btn btn-download" target="_blank" rel="noopener">
+                        ⬇ Скачать видео
+                    </a>
+                </div>
+            </section>
+
+            <!-- Ошибка -->
+            <section id="error-section" class="card error-section hidden">
+                <h2>❌ Ошибка</h2>
+                <p id="error-message" class="error-message"></p>
+            </section>
+
+            <!-- История -->
+            <section id="history-section" class="card history-section">
+                <h2>📋 История запросов</h2>
+                <div id="history-list">
+                    {% if history %}
+                        {% for entry in history %}
+                        <div class="history-item {{ 'history-success' if entry.success else 'history-error' }}">
+                            <div class="history-url" title="{{ entry.input_url }}">
+                                {{ entry.input_url[:80] }}{% if entry.input_url|length > 80 %}...{% endif %}
+                            </div>
+                            <div class="history-meta">
+                                {% if entry.success %}
+                                    <span class="history-status success">✅ {{ entry.content_length_str }}</span>
+                                    <span class="history-time">{{ entry.timestamp[:19] }}</span>
+                                {% else %}
+                                    <span class="history-status error">❌ Ошибка</span>
+                                    <span class="history-time">{{ entry.timestamp[:19] }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="history-empty">История пуста. Вставьте ссылку на вебинар выше.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>
+                Сервис формирует прямую ссылку на CDN saby.ru.
+                Видео скачивается напрямую с серверов Saby, не через наш сервер.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const form = document.getElementById('extract-form');
+        const urlInput = document.getElementById('url-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const spinner = submitBtn.querySelector('.spinner');
+
+        const resultSection = document.getElementById('result-section');
+        const errorSection = document.getElementById('error-section');
+        const errorMessage = document.getElementById('error-message');
+
+        const inputUrlDisplay = document.getElementById('input-url-display');
+        const cdnUrlDisplay = document.getElementById('cdn-url-display');
+        const filenameDisplay = document.getElementById('filename-display');
+        const fileSize = document.getElementById('file-size');
+        const accessibilityDisplay = document.getElementById('accessibility-display');
+        const downloadLink = document.getElementById('download-link');
+        const copyBtn = document.getElementById('copy-btn');
+
+        const historyList = document.getElementById('history-list');
+
+        function setLoading(loading) {
+            if (loading) {
+                submitBtn.disabled = true;
+                btnText.classList.add('hidden');
+                spinner.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function showResult(data) {
+            resultSection.classList.remove('hidden');
+            errorSection.classList.add('hidden');
+
+            inputUrlDisplay.textContent = data.input_url || urlInput.value;
+            cdnUrlDisplay.value = data.cdn_url;
+            filenameDisplay.textContent = data.filename || '—';
+
+            if (data.content_length_str) {
+                fileSize.textContent = data.content_length_str;
+                fileSize.classList.remove('hidden');
+            } else {
+                fileSize.textContent = '';
+                fileSize.classList.add('hidden');
+            }
+
+            if (data.accessible) {
+                accessibilityDisplay.textContent = '✅ Доступен';
+                accessibilityDisplay.className = 'info-value status-ok';
+                downloadLink.href = data.cdn_url;
+                downloadLink.classList.remove('btn-disabled');
+            } else {
+                accessibilityDisplay.textContent = '⚠️ Не удалось проверить (возможно, ссылка работает)';
+                accessibilityDisplay.className = 'info-value status-warn';
+                downloadLink.href = data.cdn_url;
+                downloadLink.classList.remove('btn-disabled');
+            }
+
+            // Прокрутка к результату
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function showError(message) {
+            errorSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            errorMessage.textContent = message;
+            errorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function addHistoryEntry(entry) {
+            const emptyMsg = historyList.querySelector('.history-empty');
+            if (emptyMsg) emptyMsg.remove();
+
+            const item = document.createElement('div');
+            item.className = `history-item ${entry.success ? 'history-success' : 'history-error'}`;
+
+            const urlDiv = document.createElement('div');
+            urlDiv.className = 'history-url';
+            urlDiv.title = entry.input_url;
+            urlDiv.textContent = entry.input_url.length > 80
+                ? entry.input_url.substring(0, 80) + '...'
+                : entry.input_url;
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'history-meta';
+
+            const statusSpan = document.createElement('span');
+            statusSpan.className = `history-status ${entry.success ? 'success' : 'error'}`;
+            statusSpan.textContent = entry.success ? `✅ ${entry.content_length_str || 'OK'}` : '❌ Ошибка';
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'history-time';
+            timeSpan.textContent = entry.timestamp ? entry.timestamp.substring(0, 19) : '';
+
+            metaDiv.appendChild(statusSpan);
+            metaDiv.appendChild(timeSpan);
+            item.appendChild(urlDiv);
+            item.appendChild(metaDiv);
+
+            historyList.insertBefore(item, historyList.firstChild);
+
+            // Ограничиваем историю на клиенте
+            while (historyList.children.length > 20) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+
+        // Копирование в буфер обмена
+        copyBtn.addEventListener('click', async () => {
+            const text = cdnUrlDisplay.value;
+            if (!text) return;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.textContent = '✅ Скопировано!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Копировать';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                // Fallback: выделяем текст
+                cdnUrlDisplay.select();
+                document.execCommand('copy');
+                copyBtn.textContent = '✅ Скопировано!';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Копировать';
+                }, 2000);
+            }
+        });
+
+        // Автовыделение при клике на поле
+        cdnUrlDisplay.addEventListener('click', () => {
+            cdnUrlDisplay.select();
+        });
+
+        // Отправка формы
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            setLoading(true);
+            resultSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult(data);
+                    addHistoryEntry({
+                        input_url: url,
+                        success: true,
+                        cdn_url: data.cdn_url,
+                        content_length_str: data.content_length_str,
+                        timestamp: new Date().toISOString(),
+                    });
+                } else {
+                    showError(data.error || 'Неизвестная ошибка');
+                    addHistoryEntry({
+                        input_url: url,
+                        success: false,
+                        timestamp: new Date().toISOString(),
+                    });
+                }
+            } catch (err) {
+                showError('Ошибка соединения с сервером. Попробуйте позже.');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

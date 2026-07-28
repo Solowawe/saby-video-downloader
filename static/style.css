@@ -1,0 +1,447 @@
+/* ===== Saby Video Downloader — Styles ===== */
+
+:root {
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+/* ===== Header ===== */
+
+header {
+    text-align: center;
+    padding: 40px 0 32px;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+/* ===== Cards ===== */
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
+
+/* ===== Input Section ===== */
+
+.input-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.url-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    transition: border-color 0.2s;
+    outline: none;
+    background: var(--bg);
+}
+
+.url-input:focus {
+    border-color: var(--primary);
+    background: #fff;
+}
+
+.url-input::placeholder {
+    color: #9ca3af;
+    font-family: inherit;
+}
+
+.hint {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.hint code {
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    word-break: break-all;
+}
+
+/* ===== Buttons ===== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.btn-copy {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+}
+
+.btn-copy:hover {
+    background: #e5e7eb;
+}
+
+.btn-copy.copied {
+    background: var(--success);
+    color: #fff;
+    border-color: var(--success);
+}
+
+.btn-download {
+    background: var(--success);
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 1.05rem;
+    width: 100%;
+}
+
+.btn-download:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ===== Spinner ===== */
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== Result Section ===== */
+
+.result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.result-header h2 {
+    font-size: 1.2rem;
+}
+
+.file-size {
+    background: var(--success);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.result-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 0.92rem;
+    word-break: break-all;
+}
+
+.url-display {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.cdn-url-row {
+    display: flex;
+    gap: 6px;
+}
+
+.cdn-url-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+    background: var(--bg);
+    color: var(--text);
+    cursor: text;
+}
+
+.cdn-url-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.status-ok {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-warn {
+    color: var(--warning);
+    font-weight: 500;
+}
+
+.result-actions {
+    margin-top: 20px;
+}
+
+/* ===== Error Section ===== */
+
+.error-section h2 {
+    color: var(--error);
+    margin-bottom: 8px;
+}
+
+.error-message {
+    color: var(--text-secondary);
+    white-space: pre-line;
+}
+
+/* ===== History Section ===== */
+
+.history-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.history-empty {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 20px;
+}
+
+.history-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.history-item:hover {
+    background: var(--bg);
+}
+
+.history-success {
+    border-left: 3px solid var(--success);
+}
+
+.history-error {
+    border-left: 3px solid var(--error);
+}
+
+.history-url {
+    font-size: 0.85rem;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--text);
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+
+.history-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+}
+
+.history-status.success {
+    color: var(--success);
+}
+
+.history-status.error {
+    color: var(--error);
+}
+
+.history-time {
+    color: var(--text-secondary);
+}
+
+/* ===== Footer ===== */
+
+footer {
+    text-align: center;
+    padding: 24px 0 40px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+}
+
+footer p {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ===== Анимации ===== */
+
+.result-section,
+.error-section {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Адаптивность ===== */
+
+@media (max-width: 600px) {
+    .container {
+        padding: 12px 10px;
+    }
+
+    header {
+        padding: 24px 0 20px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .input-row {
+        flex-direction: column;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+
+    .cdn-url-row {
+        flex-direction: column;
+    }
+
+    .btn-copy {
+        width: 100%;
+    }
+
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
