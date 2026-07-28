@@ -1,81 +1,93 @@
-# Инструкция по деплою на Render.com
+# Инструкция по деплою на Railway.app
 
-## Шаг 1: Создать репозиторий на GitHub
+## Шаг 1: Создать аккаунт на Railway.app
 
-1. Откройте https://github.com/new
-2. **Repository name:** `saby-video-downloader`
-3. **Public** (обязательно для бесплатного тарифа Render)
-4. **Не** нажимайте "Add a README" (у нас уже есть)
-5. Нажмите **Create repository**
+1. Откройте https://railway.app
+2. Нажмите **Start a New Project** или **Login**
+3. Выберите **Continue with GitHub**
+4. Авторизуйте Railway.app для доступа к вашему GitHub аккаунту
+5. Подтвердите email (если потребуется)
 
-## Шаг 2: Загрузить код в репозиторий
+## Шаг 2: Развернуть сервис
 
-После создания репозитория, выполните в терминале:
+### Способ A — Через GitHub (рекомендуемый)
+
+1. На панели Railway.app нажмите **New Project**
+2. Выберите **Deploy from GitHub repo**
+3. Выберите репозиторий `Solowawe/saby-video-downloader`
+4. Railway автоматически определит Python и запустит сборку
+
+### Способ B — Через Railway CLI
 
 ```bash
-# Перейти в папку web_service
+# Установить Railway CLI
+npm i -g @railway/cli
+
+# Войти в аккаунт
+railway login
+
+# Перейти в папку проекта
 cd d:\prjs\smart\cursor\video_downloader\web_service
 
-# Инициализировать git
-git init
-git add .
-git commit -m "Initial commit: Saby Video Downloader web service"
+# Инициализировать проект
+railway init
 
-# Подключить ваш репозиторий (ЗАМЕНИТЕ username на ваш GitHub логин!)
-git remote add origin https://github.com/username/saby-video-downloader.git
-
-# Отправить код
-git branch -M main
-git push -u origin main
+# Развернуть
+railway up
 ```
 
-## Шаг 3: Создать аккаунт на Render.com
+## Шаг 3: Настройки проекта
 
-1. Откройте https://render.com
-2. Нажмите **Get started** или **Sign up**
-3. Выберите **Continue with GitHub**
-4. Разрешите доступ к репозиторию `saby-video-downloader`
+Railway.app автоматически определит настройки из `requirements.txt` и `runtime.txt`, но нужно проверить:
 
-## Шаг 4: Создать Web Service
+1. Откройте проект в Railway Dashboard
+2. Перейдите в **Variables**
+3. Убедитесь, что переменная `PORT` установлена автоматически (Railway добавляет её сам)
+4. Перейдите в **Settings** → **Deploy**
 
-1. На панели Render нажмите **New +** → **Web Service**
-2. Выберите репозиторий `saby-video-downloader`
-3. Настройки:
+Проверьте команды (должны определиться автоматически, но если нет — укажите вручную):
 
 | Параметр | Значение |
 |----------|----------|
-| **Name** | `saby-video-downloader` |
-| **Region** | `Frankfurt (EU)` (ближе всего к России) |
-| **Branch** | `main` |
-| **Root Directory** | (оставьте пустым, т.к. репозиторий содержит только web_service) |
-| **Runtime** | `Python 3` |
+| **Root Directory** | (оставьте пустым) |
 | **Build Command** | `pip install -r requirements.txt` |
 | **Start Command** | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
-| **Plan** | **Free** |
 
-4. Нажмите **Create Web Service**
+## Шаг 4: Дождаться деплоя
 
-## Шаг 5: Готово!
+1. Railway автоматически запустит сборку и развёртывание
+2. Статус изменится с **Deploying** на **Running** (обычно 1-3 минуты)
+3. Нажмите на **Generate Domain** или используйте автоматически сгенерированный URL вида:
+   ```
+   https://saby-video-downloader.up.railway.app
+   ```
 
-Через 2-3 минуты сервис будет доступен по адресу:
-```
-https://saby-video-downloader.onrender.com
-```
-
-**Важно:** На бесплатном тарифе Render сервис "засыпает" после 15 минут бездействия.
-Первый запрос после сна может занимать 10-30 секунд (пробуждение).
-
-## Проверка
+## Шаг 5: Проверка
 
 Откройте в браузере:
+
 ```
-https://saby-video-downloader.onrender.com/health
+https://ВАШ-ДОМЕН.railway.app/health
 ```
+
 Должен вернуться `{"status": "ok"}`.
+
+Затем откройте главную страницу и проверьте извлечение ссылки:
+```
+https://ВАШ-ДОМЕН.railway.app/
+```
+
+## Важно
+
+- **Бесплатный тариф Railway** включает 500 часов в месяц и 100 GB трафика
+- Сервис **не "засыпает"** как на Render.com (но может быть ограничение по трафику)
+- Если нужно больше — можно обновить тариф ($5/мес за дополнительные ресурсы)
+- Railway использует **эфемерную файловую систему** — история запросов хранится в памяти и сбрасывается при перезапуске
 
 ## Обновление кода
 
-После изменений в коде:
+После изменений в коде — просто запушите в GitHub:
+
 ```bash
 cd d:\prjs\smart\cursor\video_downloader\web_service
 git add .
@@ -83,4 +95,10 @@ git commit -m "Описание изменений"
 git push
 ```
 
-Render автоматически перезапустит сервис.
+Railway автоматически перезапустит сервис (при подключении через GitHub).
+
+## Полезные ссылки
+
+- [Railway Dashboard](https://railway.app/dashboard)
+- [Railway Documentation](https://docs.railway.app)
+- [GitHub репозиторий](https://github.com/Solowawe/saby-video-downloader)
