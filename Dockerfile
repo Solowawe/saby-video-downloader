@@ -9,5 +9,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем код
 COPY . .
 
-# Railway сам устанавливает PORT переменную
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Порт по умолчанию 8000, но Railway может переопределить через PORT
+ENV PORT=8000
+
+# Явно указываем порт
+EXPOSE 8000
+
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
