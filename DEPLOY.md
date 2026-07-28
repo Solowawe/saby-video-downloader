@@ -38,7 +38,7 @@ railway up
 
 ## Шаг 3: Настройки проекта
 
-Railway.app автоматически определит настройки из `requirements.txt` и `runtime.txt`, но нужно проверить:
+Railway.app автоматически определит настройки из `requirements.txt`, но нужно проверить:
 
 1. Откройте проект в Railway Dashboard
 2. Перейдите в **Variables**
@@ -52,6 +52,8 @@ Railway.app автоматически определит настройки и�
 | **Root Directory** | (оставьте пустым) |
 | **Build Command** | `pip install -r requirements.txt` |
 | **Start Command** | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+
+> **Важно:** `runtime.txt` удалён из репозитория, т.к. mise (менеджер версий Python на Railway) не имеет предварительно собранных бинарников для `python-3.11.0`. Railway сам выберет подходящую версию Python (3.12+). Все зависимости совместимы.
 
 ## Шаг 4: Дождаться деплоя
 
